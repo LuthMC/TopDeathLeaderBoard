@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YourPluginName;
+namespace Luthfi\TopDeathLeaderBoard;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -14,6 +14,7 @@ use pocketmine\utils\Config;
 use pocketmine\world\World;
 use pocketmine\math\Vector3;
 use pocketmine\world\particle\FloatingTextParticle;
+use jojoe77777\FormAPI\SimpleForm;
 
 class Main extends PluginBase implements Listener {
 
@@ -49,7 +50,7 @@ class Main extends PluginBase implements Listener {
         if ($command->getName() === "topdeaths") {
             if ($sender instanceof Player) {
                 if ($sender->hasPermission("topdeaths.command.topdeaths")) {
-                    $this->showTopDeaths($sender);
+                    $this->showTopDeathsUI($sender);
                     return true;
                 } else {
                     $sender->sendMessage("You do not have permission to use this command.");
@@ -76,17 +77,25 @@ class Main extends PluginBase implements Listener {
         return false;
     }
 
-    private function showTopDeaths(Player $player): void {
+    private function showTopDeathsUI(Player $player): void {
         $deathsArray = $this->deaths->getAll();
         arsort($deathsArray);
         $topDeaths = array_slice($deathsArray, 0, 10, true);
 
-        $player->sendMessage("Top 10 Deaths:");
+        $form = new SimpleForm(function (Player $player, $data) {
+        });
+
+        $form->setTitle("Top 10 Deaths");
+        $text = "Top 10 Deaths:\n";
         $rank = 1;
         foreach ($topDeaths as $name => $deaths) {
-            $player->sendMessage("#$rank $name - $deaths deaths");
+            $text .= "#$rank $name - $deaths deaths\n";
             $rank++;
         }
+        $form->setContent($text);
+        $form->addButton("Close");
+
+        $player->sendForm($form);
     }
 
     private function setLeaderboardLocation(Player $player): void {
@@ -120,7 +129,6 @@ class Main extends PluginBase implements Listener {
 
             $location = new Vector3($x, $y, $z);
 
-            // Remove the existing floating text particle if it exists
             if ($this->floatingTextParticle !== null) {
                 $world->removeParticle($this->floatingTextParticle);
             }
