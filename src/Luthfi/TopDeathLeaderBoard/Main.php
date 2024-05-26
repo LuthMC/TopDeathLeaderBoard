@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Luthfi\TopDeathLeaderBoard;
+namespace YourPluginName;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -19,6 +19,7 @@ class Main extends PluginBase implements Listener {
 
     private $deaths;
     private $leaderboardLocation;
+    private $floatingTextParticle;
 
     public function onEnable(): void {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -30,6 +31,7 @@ class Main extends PluginBase implements Listener {
             "z" => null,
             "world" => null
         ]);
+        $this->floatingTextParticle = null;
     }
 
     public function onDeath(PlayerDeathEvent $event): void {
@@ -44,9 +46,9 @@ class Main extends PluginBase implements Listener {
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
-        if ($command->getName() === "topdeath") {
+        if ($command->getName() === "topdeaths") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("topdeath.cmd")) {
+                if ($sender->hasPermission("topdeaths.command.topdeaths")) {
                     $this->showTopDeaths($sender);
                     return true;
                 } else {
@@ -59,7 +61,7 @@ class Main extends PluginBase implements Listener {
             }
         } elseif ($command->getName() === "settopdeath") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("settopdeath.cmd")) {
+                if ($sender->hasPermission("topdeaths.command.settopdeath")) {
                     $this->setLeaderboardLocation($sender);
                     return true;
                 } else {
@@ -118,6 +120,11 @@ class Main extends PluginBase implements Listener {
 
             $location = new Vector3($x, $y, $z);
 
+            // Remove the existing floating text particle if it exists
+            if ($this->floatingTextParticle !== null) {
+                $world->removeParticle($this->floatingTextParticle);
+            }
+
             $deathsArray = $this->deaths->getAll();
             arsort($deathsArray);
             $topDeaths = array_slice($deathsArray, 0, 10, true);
@@ -129,8 +136,8 @@ class Main extends PluginBase implements Listener {
                 $rank++;
             }
 
-            $particle = new FloatingTextParticle($text, "");
-            $world->addParticle($location, $particle);
+            $this->floatingTextParticle = new FloatingTextParticle($text, "");
+            $world->addParticle($location, $this->floatingTextParticle);
         }
     }
 }
