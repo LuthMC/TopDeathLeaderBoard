@@ -1,0 +1,19 @@
+name: TopDeathLeaderBoard
+main: Luthfi\TopDeathLeaderBoard\Main
+version: 1.0.0
+api: 5.0.0
+author: Luthfi
+commands:
+  topdeath:
+    description: Show the top death leaderboard
+    permission: topdeath.cmd
+  settopdeath:
+    description: Set the location of the top death leaderboard
+    permission: settopdeath.cmd
+permissions:
+  topdeath.cmd:
+    description: Allows the player to use the /topdeaths command
+    default: true
+  settopdeath.cmd:
+    description: Allows the player to use the /settopdeath command
+    default: op
