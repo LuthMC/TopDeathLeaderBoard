@@ -49,7 +49,7 @@ class Main extends PluginBase implements Listener {
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if ($command->getName() === "topdeaths") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("topdeaths.command.topdeaths")) {
+                if ($sender->hasPermission("topdeath.cmd")) {
                     $this->showTopDeathsUI($sender);
                     return true;
                 } else {
@@ -62,7 +62,7 @@ class Main extends PluginBase implements Listener {
             }
         } elseif ($command->getName() === "settopdeath") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("topdeaths.command.settopdeath")) {
+                if ($sender->hasPermission("settopdeath.cmd")) {
                     $this->setLeaderboardLocation($sender);
                     return true;
                 } else {
@@ -129,9 +129,7 @@ class Main extends PluginBase implements Listener {
 
             $location = new Vector3($x, $y, $z);
 
-            if ($this->floatingTextParticle !== null) {
-                $world->removeParticle($this->floatingTextParticle);
-            }
+            $world->setBlock($location, \pocketmine\block\VanillaBlocks::AIR());
 
             $deathsArray = $this->deaths->getAll();
             arsort($deathsArray);
